@@ -16,3 +16,16 @@ def add_salt_pepper(img, prob):
     noisy[mask < prob/2] = 0
     noisy[(mask >= prob/2) & (mask < prob)] = 255
     return noisy
+
+# # Test utility functions
+# probs = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
+
+# for p in probs:
+#     noisy = add_salt_pepper(original, p)
+#     filtered = selective_peeling_filter(noisy)
+#     filtered = fuzzy_weighted_linear_filter(filtered)
+
+#     print(f"Noise {p*100:.1f}%:")
+#     print("  MSE:", mse(original, filtered))
+#     print("  MAE:", mae(original, filtered))
+#     print("  PSNR:", psnr(original, filtered))
