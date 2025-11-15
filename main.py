@@ -1,5 +1,6 @@
 from src.filters import selective_peeling_filter
 from src.filters import fuzzy_weighted_linear_filter
+from src.utils import mse, mae, psnr
 import cv2
 import numpy as np
 
@@ -32,6 +33,14 @@ def main():
     print("Pixels changed:", changed2)
 
     cv2.imwrite("data/cleaned_step2.tif", step2)
+
+    original = cv2.imread("data/lena.tif", cv2.IMREAD_GRAYSCALE)
+    filtered = cv2.imread("data/cleaned_step2.tif", cv2.IMREAD_GRAYSCALE)
+
+    print("MSE:", mse(original, filtered))
+    print("MAE:", mae(original, filtered))
+    print("PSNR:", psnr(original, filtered))
+
 
 if __name__ == "__main__":
     main()
