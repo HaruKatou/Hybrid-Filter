@@ -17,6 +17,12 @@ def add_salt_pepper(img, prob):
     noisy[(mask >= prob/2) & (mask < prob)] = 255
     return noisy
 
+def add_gaussian_noise(img, mean=0, sigma=10):
+    noise = np.random.normal(mean, sigma, img.shape).astype(np.float32)
+    noisy_image = img.astype(np.float32) + noise
+    noisy_image = np.clip(noisy_image, 0, 255)
+    return noisy_image.astype(np.uint8)
+
 # # Test utility functions
 # probs = [0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
 

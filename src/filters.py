@@ -33,7 +33,7 @@ def selective_peeling_filter(img, window_size=3, threshold=30, iterations=1):
                     if abs(val - median) > threshold:
                         # Replace pixel by median
                         if img_filtered[i, j] == val:
-                            new_img[i, j] = median
+                            # new_img[i, j] = median
                             is_outlier = True
                             break
                     else:

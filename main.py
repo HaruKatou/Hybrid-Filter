@@ -1,17 +1,25 @@
 from src.filters import selective_peeling_filter
 from src.filters import fuzzy_weighted_linear_filter
-from src.utils import mse, mae, psnr
+from src.utils import mse, mae, psnr, add_salt_pepper, add_gaussian_noise
 import cv2
 import numpy as np
 
 def main():
+    np.random.seed(42)
     img = cv2.imread("data/lena.tif", cv2.IMREAD_GRAYSCALE)
+
 
     if img is None:
         raise ValueError("Không thể đọc file TIFF!")
 
     if img.dtype == 'uint16':
         img = (img / 256).astype('uint8')
+
+    noisy_img = add_gaussian_noise(img, mean=0, sigma=10)
+    noisy_img = add_salt_pepper(noisy_img, prob=0.2441)
+    # noisy_img = add_salt_pepper(noisy_img, prob=0.1221)
+    # noisy_img = add_salt_pepper(noisy_img, prob=0.0610)
+    # noisy_img = add_salt_pepper(noisy_img, prob=0.0122)
 
     step1 = selective_peeling_filter(
         img, 
@@ -34,13 +42,40 @@ def main():
 
     cv2.imwrite("data/cleaned_step2.tif", step2)
 
+    cv2.imwrite("data/noisy.tif", noisy_img)
+
     original = cv2.imread("data/lena.tif", cv2.IMREAD_GRAYSCALE)
     filtered = cv2.imread("data/cleaned_step2.tif", cv2.IMREAD_GRAYSCALE)
+    step1 = cv2.imread("data/cleaned_step1.tif", cv2.IMREAD_GRAYSCALE)
 
+    step1 = selective_peeling_filter(
+        noisy_img, 
+        window_size=5, 
+        threshold=25, 
+        iterations=2
+    )
+    changed1 = np.sum(step1 != img)
+    print("Pixels changed:", changed1)
+    cv2.imwrite("data/cleaned_step1.tif", step1)
+
+    filtered_noisy = fuzzy_weighted_linear_filter(
+        step1, 
+        window_size=5, 
+        sigma=10.0
+    )
+
+    print("--- Noisy ---")
+    print("MSE:", mse(original, noisy_img))
+    print("MAE:", mae(original, noisy_img))
+    print("PSNR:", psnr(original, noisy_img))
+    print("--- Filter for Original ---")
     print("MSE:", mse(original, filtered))
     print("MAE:", mae(original, filtered))
     print("PSNR:", psnr(original, filtered))
-
+    print("--- Filter for Noisy ---")
+    print("MSE:", mse(original, filtered_noisy))
+    print("MAE:", mae(original, filtered_noisy))
+    print("PSNR:", psnr(original, filtered_noisy))
 
 if __name__ == "__main__":
     main()
