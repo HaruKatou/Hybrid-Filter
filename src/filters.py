@@ -26,26 +26,37 @@ def selective_peeling_filter(img, window_size=3, threshold=30, iterations=1):
                 win_sorted = np.sort(win, axis=None)
                 median = win_sorted[len(win_sorted) // 2]
 
+                is_outlier = False
+
                 # Peel from max → downwards
                 for val in reversed(win_sorted):
                     if abs(val - median) > threshold:
                         # Replace pixel by median
                         if img_filtered[i, j] == val:
                             new_img[i, j] = median
+                            is_outlier = True
+                            break
                     else:
                         break
+
+                # Peel from min → upwards
+                if not is_outlier:
+                    for val in win_sorted:
+                        if abs(val - median) > threshold:
+                            if img_filtered[i, j] == val:
+                                is_outlier = True
+                                break
+                        else:
+                            break
+                
+                if is_outlier:
+                    new_img[i, j] = median
 
         img_filtered = new_img
 
     return img_filtered.astype(np.uint8)
 
 def fuzzy_weighted_linear_filter(img, window_size=5, sigma=10.0):
-    """
-    Step 2 - Fuzzy Weighted Linear Filter
-    img: grayscale numpy array
-    window_size: must be odd
-    sigma: controls fuzzy sensitivity (5–15 is good)
-    """
     assert window_size % 2 == 1, "window_size must be odd"
 
     pad = window_size // 2
