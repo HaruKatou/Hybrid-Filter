@@ -44,7 +44,7 @@ python evaluate.py
 
 ```
 
-### 6. Vẽ biểu đồ (đã vẽ sẵn ở ảnh figure_2_replication.png)
+### 6. Vẽ biểu đồ
 ```bash
 python plot.py
 
