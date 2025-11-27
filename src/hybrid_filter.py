@@ -76,8 +76,6 @@ def fuzzy_weighted_linear_filter_optimized(img, window_size=5, sigma=10.0):
     img_float = img.astype(np.float32)
     filtered = np.zeros_like(img_float)
     
-    # Precompute Gaussian lookup table (Fuzzy Membership)
-    # Range 0-255
     fuzzy_table = np.exp(-(np.arange(256)**2) / (2 * sigma**2))
     
     for i in range(pad, h - pad):
@@ -87,21 +85,17 @@ def fuzzy_weighted_linear_filter_optimized(img, window_size=5, sigma=10.0):
             numerator = 0.0
             denominator = 0.0
             
-            # Convolve manually for speed in Numba
             for m in range(-pad, pad + 1):
                 for n in range(-pad, pad + 1):
                     neighbor_val = img_float[i + m, j + n]
                     
-                    # Calculate Difference (Delta x)
                     diff = int(abs(neighbor_val - center_val))
                     
-                    # Lookup Fuzzy Weight
                     weight = fuzzy_table[diff]
                     
                     numerator += weight * neighbor_val
                     denominator += weight
             
-            # Avoid division by zero
             if denominator > 0:
                 filtered[i, j] = numerator / denominator
             else:

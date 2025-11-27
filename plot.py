@@ -7,9 +7,9 @@ from src.utils import mse, mae, psnr, add_salt_pepper
 
 def run_hybrid_filter(img, peel_iter=2, fuzzy_sigma=10.0):
     # Step 1: Selective Peeling
-    step1 = selective_peeling_filter(img, window_size=5, threshold=25, iterations=peel_iter)
+    step1 = selective_peeling_filter(img, window_size=3, threshold=30, iterations=peel_iter)
     # Step 2: Fuzzy Weighted
-    step2 = fuzzy_weighted_linear_filter(step1, window_size=5, sigma=fuzzy_sigma)
+    step2 = fuzzy_weighted_linear_filter(step1, window_size=3, sigma=fuzzy_sigma)
     return step2
 
 def main():
@@ -49,7 +49,7 @@ def main():
         hybrid_res = run_hybrid_filter(noisy_img, peel_iter=iters)
         
         # --- Filter 2: Standard Median (OpenCV) ---
-        median_res = cv2.medianBlur(noisy_img, 5)
+        median_res = cv2.medianBlur(noisy_img, 3)
         
         # Tính metrics
         metrics["mse"]["hybrid"].append(mse(original, hybrid_res))
