@@ -38,4 +38,15 @@ git checkout -b branch_name
 # Sau khi hoàn thành, tạo pull request từ feature branch vào master
 ```
 
+### 5. Chạy đánh giá
+```bash
+python evaluate.py
 
+```
+
+### 6. Vẽ biểu đồ
+```bash
+python plot.py
+
+
+```

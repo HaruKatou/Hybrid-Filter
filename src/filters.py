@@ -1,6 +1,6 @@
 import numpy as np
 
-def selective_peeling_filter(img, window_size=3, threshold=30, iterations=1):
+def selective_peeling_filter(img, window_size=3, threshold=50, iterations=1):
     """
     Step 1: Selective-Peeling to remove impulsive noise.
     img: grayscale image (numpy array)
