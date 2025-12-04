@@ -6,9 +6,7 @@ from src.filters import selective_peeling_filter, fuzzy_weighted_linear_filter
 from src.utils import mse, mae, psnr, add_salt_pepper
 
 def run_hybrid_filter(img, peel_iter=2, fuzzy_sigma=10.0):
-    # Step 1: Selective Peeling
     step1 = selective_peeling_filter(img, window_size=3, threshold=30, iterations=peel_iter)
-    # Step 2: Fuzzy Weighted
     step2 = fuzzy_weighted_linear_filter(step1, window_size=3, sigma=fuzzy_sigma)
     return step2
 
@@ -26,10 +24,8 @@ def main():
 
     print("Đang tính toán các chỉ số cho biểu đồ (sẽ mất vài phút)...")
 
-    # Các mức nhiễu Impulse cần test (từ 5% đến 70%)
     noise_percents = [5, 10, 20, 30, 40, 50, 60, 70]
     
-    # Lưu kết quả
     metrics = {
         "mse": {"hybrid": [], "median": []},
         "mae": {"hybrid": [], "median": []},
@@ -63,12 +59,10 @@ def main():
         
         print("Done.")
 
-    # 2. Vẽ biểu đồ (Figure 2 Replication)
     print("Đang vẽ biểu đồ...")
     
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
     
-    # Style cho đường
     style_hybrid = {'color': 'black', 'marker': 'o', 'linestyle': '-', 'label': 'Proposed Filter'}
     style_median = {'color': 'red', 'marker': 'x', 'linestyle': '--', 'label': 'Median Filter'}
 
@@ -104,7 +98,6 @@ def main():
 
     plt.tight_layout()
     
-    # Lưu ảnh
     output_file = "figure_2_replication.png"
     plt.savefig(output_file, dpi=300)
     print(f"Đã lưu biểu đồ tại: {output_file}")

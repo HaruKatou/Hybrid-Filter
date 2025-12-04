@@ -13,13 +13,13 @@ def run_hybrid_filter(img, peel_iter=2, fuzzy_sigma=130.0):
     return step2
 
 def evaluate_1(original_img):
+    np.random.seed(42)
     print("Đang tính toán các chỉ số cho biểu đồ (sẽ mất vài phút)...")
 
     noise_percents = [5, 10, 20, 30, 40, 50, 60, 70]
 
     g_sigma = 10
     
-    # Lưu kết quả
     metrics = {
         "mse": {"hybrid": [], "median": []},
         "mae": {"hybrid": [], "median": []},
@@ -34,14 +34,12 @@ def evaluate_1(original_img):
         noisy_img = add_salt_pepper(noisy_img, prob=prob)
         
         # --- Filter 1: Proposed Hybrid ---
-        # Tăng số lần peel với nhiễu cao để hiệu quả hơn (như bài báo gợi ý)
-        iters = 2 if prob < 0.4 else 4
+        iters = 2
         hybrid_res = run_hybrid_filter(noisy_img, peel_iter=iters)
         
-        # --- Filter 2: Standard Median (OpenCV) ---
+        # --- Filter 2: Standard Median ---
         median_res = cv2.medianBlur(noisy_img, 5)
         
-        # Tính metrics
         metrics["mse"]["hybrid"].append(mse(original_img, hybrid_res))
         metrics["mse"]["median"].append(mse(original_img, median_res))
         
@@ -107,31 +105,27 @@ def evaluate_2(original_img):
     print("Scenario: Gaussian(sigma=10) + Salt&Pepper")
     print("="*60)
     
+    np.random.seed(42)
     g_sigma = 10
     impulse_prob = 0.4
     
-    # Tạo nhiễu hỗn hợp: Cộng Gaussian trước, sau đó rải muối tiêu
     temp = add_gaussian_noise(original_img, mean=0, sigma=g_sigma)
     noisy_mixed = add_salt_pepper(temp, prob=impulse_prob)
     
     m_noisy = [mse(original_img, noisy_mixed), mae(original_img, noisy_mixed), psnr(original_img, noisy_mixed)]
 
-    # 2. Average Filter (Linear)
     print("Running Average Filter...")
     avg_res = cv2.blur(noisy_mixed, (5,5))
     m_avg = [mse(original_img, avg_res), mae(original_img, avg_res), psnr(original_img, avg_res)]
 
-    # 3. Median Filter (Nonlinear)
     print("Running Median Filter...")
     med_res = cv2.medianBlur(noisy_mixed, 5)
     m_med = [mse(original_img, med_res), mae(original_img, med_res), psnr(original_img, med_res)]
 
-    # 4. Proposed Hybrid Filter
     print("Running Your Hybrid Filter (Full Resolution)...")
     prop_res = run_hybrid_filter(noisy_mixed, peel_iter=2)
     m_prop = [mse(original_img, prop_res), mae(original_img, prop_res), psnr(original_img, prop_res)]
 
-    # Tạo bảng
     data = {
         "Metric": ["MSE", "MAE", "PSNR"],
         "Noisy Img": [f"{x:.2f}" for x in m_noisy],
@@ -146,9 +140,9 @@ def evaluate_2(original_img):
 
 
 def evaluate_3(original_img):
+    np.random.seed(42)
     fig, axes = plt.subplots(1, 5, figsize=(10, 6))
 
-    # Gaussian (0, 10^2) + Salt & Pepper Noise
     g_sigma = 10
     impulse_prob = 0.4
 
