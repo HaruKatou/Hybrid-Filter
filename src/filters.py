@@ -31,7 +31,6 @@ def selective_peeling_filter(img, window_size=3, threshold=50, iterations=1):
                 # Peel from max → downwards
                 for val in reversed(win_sorted):
                     if abs(val - median) > threshold:
-                        # Replace pixel by median
                         if img_filtered[i, j] == val:
                             # new_img[i, j] = median
                             is_outlier = True
@@ -65,27 +64,22 @@ def fuzzy_weighted_linear_filter(img, window_size=5, sigma=10.0):
 
     filtered = np.zeros_like(img)
 
-    # Precompute gaussian fuzzy weights for speed
     max_diff = 255
     diff_range = np.arange(0, max_diff + 1)
     fuzzy_table = np.exp(-(diff_range**2) / (2 * sigma**2))
 
-    # Pad image
     padded = np.pad(img, pad, mode='reflect')
 
     for i in range(h):
         for j in range(w):
 
-            # Extract window
             win = padded[i:i+window_size, j:j+window_size]
 
             center = padded[i+pad, j+pad]
             diff = np.abs(win - center).astype(np.int32)
 
-            # Lookup fuzzy weights
             weights = fuzzy_table[diff]
 
-            # Weighted average
             numerator = np.sum(weights * win)
             denominator = np.sum(weights)
 
